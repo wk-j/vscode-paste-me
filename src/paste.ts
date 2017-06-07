@@ -4,27 +4,29 @@ import { exec } from 'child_process'
 
 export class PasteMe {
 
-    items: vscode.QuickPickItem[] = [];
 
-    constructor() {
-        this.clearItems();
+    constructor() { }
+
+    async process() {
         let commands = vscode.workspace.getConfiguration("pasteMe").get("commands") as string[];
         let newCommands = commands.map(this.replaceVar);
-        newCommands.forEach(x => this.executeCommand(x));
+        let nestedItems = await Promise.all(newCommands.map(async x => await this.executeCommand(x)));
+        let items = nestedItems.reduce((a,b) => a.concat(b), []);
+        return items;
     }
 
-    private executeCommand(command: string) {
+    private async executeCommand(command: string) {
         var that = this;
-        exec(command, (err, stdout, stderr) => {
-            if (!err) {
-                let results = stdout.split('\n').map(that.creatItem);
-                this.appends(results);
-            }
-        });
-    }
-
-    private appends(items: vscode.QuickPickItem[]) {
-        items.forEach(x => this.items.push(x));
+        return new Promise<vscode.QuickPickItem[]>(resolve => {
+            let items: vscode.QuickPickItem[] = [];
+            exec(command, (err, stdout, stderr) => {
+                if (!err) {
+                    let results = stdout.split('\n').filter(x => x.trim() != "").map(that.creatItem);
+                    results.forEach(x => items.push(x));
+                }
+                resolve(items);
+            });
+        })
     }
 
     private replaceVar(command: string) {
@@ -33,25 +35,24 @@ export class PasteMe {
         return command.replace("${fileName}", name).replace("${rootPath}", root);
     }
 
-    private clearItems() {
-        this.items = [];
-    }
-
     private creatItem(title: string) {
         let item = { label: title, description: "" };
         return item;
     }
 
-    showItems() {
+    async showItems() {
+        let items = await this.process();
         let options = { placeholder: "Select text" };
-        let quickPick = vscode.window.showQuickPick(this.items, options);
+        let quickPick = vscode.window.showQuickPick(items, options);
         quickPick.then(result => {
-            let text = result.label;
-            let editor = vscode.window.activeTextEditor;
-            if (editor) {
-                editor.edit(et => {
-                    et.insert(editor.selection.start, text);
-                });
+            if (result) {
+                let text = result.label;
+                let editor = vscode.window.activeTextEditor;
+                if (editor) {
+                    editor.edit(et => {
+                        et.insert(editor.selection.start, text);
+                    });
+                }
             }
         });
     }
