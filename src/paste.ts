@@ -1,14 +1,14 @@
 import * as vscode from "vscode";
 
 import { exec } from 'child_process'
+import * as fs from "fs";
 
 export class PasteMe {
 
-
     constructor() { }
 
-    async process() {
-        let commands = vscode.workspace.getConfiguration("pasteMe").get("commands") as string[];
+    async process(section: string) {
+        let commands = vscode.workspace.getConfiguration("pasteMe").get(section) as string[];
         let newCommands = commands.map(this.replaceVar);
         let nestedItems = await Promise.all(newCommands.map(async x => await this.executeCommand(x)));
         let items = nestedItems.reduce((a,b) => a.concat(b), []);
@@ -40,8 +40,30 @@ export class PasteMe {
         return item;
     }
 
+    async showFiles() {
+        let items = await this.process("files");
+        let options = { placeholder: "Select file" };
+        let quickPick = vscode.window.showQuickPick(items, options);
+        quickPick.then(result => {
+            if(result) {
+                let file = result.label;
+                fs.readFile(file, "utf8", function (err,data) {
+                    if(err) console.log(err);
+                    else {
+                        let editor = vscode.window.activeTextEditor;
+                        if (editor) {
+                           editor.edit(et => {
+                               et.insert(editor.selection.start, data);
+                           });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     async showItems() {
-        let items = await this.process();
+        let items = await this.process("commands");
         let options = { placeholder: "Select text" };
         let quickPick = vscode.window.showQuickPick(items, options);
         quickPick.then(result => {

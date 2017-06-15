@@ -1,8 +1,8 @@
 {
     "name": "vscode-paste-me",
     "displayName": "Paste Me",
-    "description": "Paste selected text into text editor",
-    "version": "0.0.3",
+    "description": "Paste text and file content",
+    "version": "0.0.4",
     "publisher": "wk-j",
     "engines": {
         "vscode": "^1.5.0"
@@ -15,7 +15,8 @@
         "url": "https://github.com/wk-j/vscode-paste-me"
     },
     "activationEvents": [
-        "onCommand:extension.pasteMe.showTexts"
+        "onCommand:extension.pasteMe.showTexts",
+        "onCommand:extension.pasteMe.showFiles"
     ],
     "main": "./out/src/extension",
     "icon": "images/icon.png",
@@ -24,11 +25,18 @@
             "command": "extension.pasteMe.showTexts",
             "title": "Paste Me: Show Texts"
         }],
-        "keybindings": [{
-            "command": "extension.pasteMe.showTexts",
-            "key": "ctrl+shift+j",
-            "mac": "cmd+shift+j"
-        }],
+        "keybindings": [
+            {
+                "command": "extension.pasteMe.showTexts",
+                "key": "ctrl+shift+j",
+                "mac": "cmd+shift+j"
+            },
+            {
+                "command": "extension.pasteMe.showFiles",
+                "key": "ctrl+shift+u",
+                "mac": "cmd+shift+u"
+            }
+        ],
         "configuration": {
 			"title": "Paste Me configuration.",
 			"type": "object",

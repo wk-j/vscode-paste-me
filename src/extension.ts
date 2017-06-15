@@ -10,11 +10,15 @@ export function activate(context: vscode.ExtensionContext) {
 
     let ins = new PasteMe();
 
-    let disposable = vscode.commands.registerCommand('extension.pasteMe.showTexts', () => {
+    let texts = vscode.commands.registerCommand('extension.pasteMe.showTexts', () => {
         ins.showItems();
     });
 
-    context.subscriptions.push(disposable);
+    let files = vscode.commands.registerCommand("extension.pasteMe.showFiles", () => {
+        ins.showFiles();
+    });
+
+    context.subscriptions.push(texts);
 }
 
 // this method is called when your extension is deactivated

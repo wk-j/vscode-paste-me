@@ -9,6 +9,9 @@ Generate list of quick paste items from command line.
 ```json
 {
     "pasteMe": {
+        "files": [
+            "mdfind -name .snippet",
+        ],
         "commands": [
             "h-extensions",
             "h-reference \"${rootPath}\" \"${fileName}\""
@@ -17,7 +20,14 @@ Generate list of quick paste items from command line.
 }
 ```
 
-## Usage
+##  Usage
+
+### Paste text
 
 - Command + Shift + J
 - Select item
+
+### Paste file content
+
+- Command + Shift + U
+- Select file
