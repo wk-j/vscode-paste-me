@@ -18,6 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
         ins.showFiles();
     });
 
+    let command = vscode.commands.registerCommand("extension.pasteMe.executeCommand", () => {
+        ins.executeLineCommand();
+    });
+
     context.subscriptions.push(texts);
 }
 

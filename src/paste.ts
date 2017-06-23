@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-
 import { exec } from 'child_process'
 import * as fs from "fs";
+import * as ncp  from "copy-paste";
 
 export class PasteMe {
 
@@ -38,6 +38,20 @@ export class PasteMe {
     private creatItem(title: string) {
         let item = { label: title, description: "" };
         return item;
+    }
+
+    async executeLineCommand() {
+        let editor = vscode.window.activeTextEditor;
+        if(editor) {
+            let position = editor.selection.start
+            let line = editor.document.lineAt(position)
+            let text = line.text
+
+            ncp.copy(text + '\n', function () {
+               vscode.commands.executeCommand("workbench.action.terminal.paste"); 
+               editor.show();
+            });
+        }
     }
 
     async showFiles() {
