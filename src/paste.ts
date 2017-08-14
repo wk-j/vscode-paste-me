@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
 import { exec } from 'child_process'
 import * as fs from "fs";
-import * as ncp  from "copy-paste";
+import * as ncp from "copy-paste";
+
+import { QuickPickOptions } from "vscode"
 
 export class PasteMe {
 
@@ -11,7 +13,7 @@ export class PasteMe {
         let commands = vscode.workspace.getConfiguration("pasteMe").get(section) as string[];
         let newCommands = commands.map(this.replaceVar);
         let nestedItems = await Promise.all(newCommands.map(async x => await this.executeCommand(x)));
-        let items = nestedItems.reduce((a,b) => a.concat(b), []);
+        let items = nestedItems.reduce((a, b) => a.concat(b), []);
         return items;
     }
 
@@ -42,33 +44,43 @@ export class PasteMe {
 
     async executeLineCommand() {
         let editor = vscode.window.activeTextEditor;
-        if(editor) {
-            let position = editor.selection.start
-            let line = editor.document.lineAt(position)
-            let text = line.text
-
-            ncp.copy(text + '\n', function () {
-               vscode.commands.executeCommand("workbench.action.terminal.paste"); 
-               editor.show();
-            });
+        if (editor) {
+            let start = editor.selection.start.line;
+            let end = editor.selection.end.line;
+            if (end - start > 0) {
+                let range =  new vscode.Range(editor.selection.anchor.line, editor.selection.anchor.character, editor.selection.active.line, editor.selection.active.character)
+                var text = editor.document.getText(range)
+                ncp.copy(text + '\n', function () {
+                    vscode.commands.executeCommand("workbench.action.terminal.paste");
+                    editor.show();
+                });
+            } else {
+                let position = editor.selection.start
+                let line = editor.document.lineAt(position)
+                let text = line.text
+                ncp.copy(text + '\n', function () {
+                    vscode.commands.executeCommand("workbench.action.terminal.paste");
+                    editor.show();
+                });
+            }
         }
     }
 
     async showFiles() {
         let items = await this.process("files");
-        let options = { placeholder: "Select file" };
+        let options = { placeHolder: "Select file" };
         let quickPick = vscode.window.showQuickPick(items, options);
         quickPick.then(result => {
-            if(result) {
+            if (result) {
                 let file = result.label;
-                fs.readFile(file, "utf8", function (err,data) {
-                    if(err) console.log(err);
+                fs.readFile(file, "utf8", function (err, data) {
+                    if (err) console.log(err);
                     else {
                         let editor = vscode.window.activeTextEditor;
                         if (editor) {
-                           editor.edit(et => {
-                               et.insert(editor.selection.start, data);
-                           });
+                            editor.edit(et => {
+                                et.insert(editor.selection.start, data);
+                            });
                         }
                     }
                 });
@@ -78,7 +90,7 @@ export class PasteMe {
 
     async showItems() {
         let items = await this.process("commands");
-        let options = { placeholder: "Select text" };
+        let options = { placeHolder: "Select text" };
         let quickPick = vscode.window.showQuickPick(items, options);
         quickPick.then(result => {
             if (result) {

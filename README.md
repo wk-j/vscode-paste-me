@@ -31,3 +31,7 @@ Generate list of quick paste items from command line.
 
 - Command + Shift + U
 - Select file
+
+### Send current line (or selection) to terminal
+
+- Command + Shift + N
