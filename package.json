@@ -20,7 +20,7 @@
         "onCommand:extension.pasteMe.executeCommand"
     ],
     "main": "./out/src/extension",
-    "icon": "images/icon.png",
+    "icon": "images/profile.png",
     "contributes": {
         "commands": [
             {
