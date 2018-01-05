@@ -48,10 +48,12 @@ export class PasteMe {
             let start = editor.selection.start.line;
             let end = editor.selection.end.line;
             if (end - start > 0) {
-                let range =  new vscode.Range(editor.selection.anchor.line, editor.selection.anchor.character, editor.selection.active.line, editor.selection.active.character)
+                let range = new vscode.Range(editor.selection.anchor.line, editor.selection.anchor.character, editor.selection.active.line, editor.selection.active.character)
                 var text = editor.document.getText(range)
                 ncp.copy(text + '\n', function () {
-                    vscode.commands.executeCommand("workbench.action.terminal.paste");
+                    vscode.commands.executeCommand("workbench.action.terminal.paste").then(() => {
+                        editor.show();
+                    });
                     editor.show();
                 });
             } else {
@@ -59,8 +61,9 @@ export class PasteMe {
                 let line = editor.document.lineAt(position)
                 let text = line.text
                 ncp.copy(text + '\n', function () {
-                    vscode.commands.executeCommand("workbench.action.terminal.paste");
-                    editor.show();
+                    vscode.commands.executeCommand("workbench.action.terminal.paste").then(() => {
+                        editor.show();
+                    });
                 });
             }
         }
