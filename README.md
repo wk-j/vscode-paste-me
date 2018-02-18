@@ -24,14 +24,14 @@ Generate list of quick paste items from command line.
 
 ### Paste text
 
-- Command + Shift + J
+- `Command + Shift + J`
 - Select item
 
 ### Paste file content
 
-- Command + Shift + U
+- `Command + Shift + U`
 - Select file
 
 ### Send current line (or selection) to terminal
 
-- Command + Shift + N
+- `Command + Shift + N`
